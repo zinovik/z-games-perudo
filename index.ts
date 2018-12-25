@@ -1,6 +1,4 @@
-import { Service } from 'typedi';
-
-import { BaseGame, BaseGameData, BaseGameMove, BaseGamePlayer, MakingMoveError } from 'z-games-base-game';
+import { BaseGame, BaseGameData, BaseGameMove, BaseGamePlayer } from 'z-games-base-game';
 
 const PLAYERS_MIN = 2;
 const PLAYERS_MAX = 6;
@@ -33,8 +31,12 @@ export interface PerudoMove extends BaseGameMove {
   isMaputo: boolean;
 }
 
-@Service()
 export class Perudo extends BaseGame {
+  private static instance: Perudo;
+
+  public static get Instance() {
+    return this.instance || (this.instance = new this());
+  }
 
   public getNewGame = (): { playersMax: number, playersMin: number, gameData: string } => {
     const gameData: PerudoData = {
@@ -103,7 +105,7 @@ export class Perudo extends BaseGame {
 
     if (move.notBelieve) {
       if (!gameData.currentDiceNumber || !gameData.currentDiceFigure) {
-        throw new MakingMoveError('First move should be bet move');
+        throw new Error('First move should be bet move');
       }
 
       let countDiceNumber = 0;
@@ -156,7 +158,7 @@ export class Perudo extends BaseGame {
         currentDiceNumber: gameData.currentDiceNumber,
         currentDiceFigure: gameData.currentDiceFigure,
       })) {
-        throw new MakingMoveError('Impossible bet');
+        throw new Error('Impossible bet');
       }
 
       const playerNumber = this.getPlayerNumber({ players: gameData.players, userId });

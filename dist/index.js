@@ -1,19 +1,12 @@
 "use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const typedi_1 = require("typedi");
 const z_games_base_game_1 = require("z-games-base-game");
 const PLAYERS_MIN = 2;
 const PLAYERS_MAX = 6;
 const PLAYER_DICES_COUNT = 5;
 const DICE_MAX_FIGURE = 6;
 const JOKER_FIGURE = 1;
-let Perudo = class Perudo extends z_games_base_game_1.BaseGame {
+class Perudo extends z_games_base_game_1.BaseGame {
     constructor() {
         super(...arguments);
         this.getNewGame = () => {
@@ -60,7 +53,7 @@ let Perudo = class Perudo extends z_games_base_game_1.BaseGame {
             let nextPlayerId;
             if (move.notBelieve) {
                 if (!gameData.currentDiceNumber || !gameData.currentDiceFigure) {
-                    throw new z_games_base_game_1.MakingMoveError('First move should be bet move');
+                    throw new Error('First move should be bet move');
                 }
                 let countDiceNumber = 0;
                 gameData.players.forEach(player => {
@@ -107,7 +100,7 @@ let Perudo = class Perudo extends z_games_base_game_1.BaseGame {
                     currentDiceNumber: gameData.currentDiceNumber,
                     currentDiceFigure: gameData.currentDiceFigure,
                 })) {
-                    throw new z_games_base_game_1.MakingMoveError('Impossible bet');
+                    throw new Error('Impossible bet');
                 }
                 const playerNumber = this.getPlayerNumber({ players: gameData.players, userId });
                 if (gameData.players[playerNumber].dicesCount === 1
@@ -218,10 +211,10 @@ let Perudo = class Perudo extends z_games_base_game_1.BaseGame {
             return true;
         };
     }
-};
-Perudo = __decorate([
-    typedi_1.Service()
-], Perudo);
+    static get Instance() {
+        return this.instance || (this.instance = new this());
+    }
+}
 exports.Perudo = Perudo;
 // For front-end
 exports.countDices = (playersInGame) => {
