@@ -178,7 +178,7 @@ export class Perudo extends BaseGame {
       nextPlayerId = this.nextPlayer({ players: gameData.players, userId });
     }
 
-    const nextPlayersIds = [];
+    const nextPlayersIds: string[] = [];
     if (nextPlayerId && this.activePlayersCount(gameData.players) > 1) {
       nextPlayersIds.push(nextPlayerId);
     }
@@ -187,7 +187,7 @@ export class Perudo extends BaseGame {
   }
 
   public getRules = (): string[] => {
-    const rules = [];
+    const rules: string[] = [];
 
     rules.push('This ancient Peruvian dice game is played with 2 to 6 players. It is a skillful game of guesswork, bluff and luck.');
     rules.push('Simultaneously, all players shake their 5 dice in their cups and turn them over on the table, using the cup to conceal their dice from the other players. Having looked at his or her own dice the first player makes a call based on an estimate of how many dice of a particular number there are under all the cups on the table. Two factors should be considered when making a call:');
