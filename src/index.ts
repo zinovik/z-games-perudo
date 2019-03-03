@@ -153,7 +153,7 @@ export class Perudo extends BaseGame {
 
     } else {
       if (!this.checkBetCorrect({
-        number: move.number,
+        moveNumber: move.number,
         figure: move.number,
         currentDiceNumber: gameData.currentDiceNumber,
         currentDiceFigure: gameData.currentDiceFigure,
@@ -285,16 +285,16 @@ export class Perudo extends BaseGame {
   }
 
   // TODO
-  private checkBetCorrect = ({ number, figure, currentDiceNumber, currentDiceFigure }: {
-    number: number,
+  private checkBetCorrect = ({ moveNumber, figure, currentDiceNumber, currentDiceFigure }: {
+    moveNumber: number,
     figure: number,
     currentDiceNumber: number,
     currentDiceFigure: number,
   }): boolean => {
-    // if (!number ||
+    // if (!moveNumber ||
     //   !figure ||
-    //   number < currentDiceNumber ||
-    //   (number === currentDiceNumber && figure <= currentDiceFigure)) {
+    //   moveNumber < currentDiceNumber ||
+    //   (moveNumber === currentDiceNumber && figure <= currentDiceFigure)) {
     //   return false;
     // }
 
@@ -354,7 +354,7 @@ export const countMinNumber = ({ currentDiceNumber, currentDiceFigure, isMaputoR
   }
 
   return Math.ceil(currentDiceNumber / 2);
-}
+};
 
 export const countMaxNumber = ({ allDicesCount }: {
   allDicesCount: number,
