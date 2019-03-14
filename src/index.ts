@@ -31,6 +31,8 @@ export interface PerudoMove extends BaseGameMove {
   isMaputo: boolean;
 }
 
+export const PERUDO = 'Perudo';
+
 export class Perudo extends BaseGame {
   private static instance: Perudo;
 
