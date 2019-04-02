@@ -1,37 +1,22 @@
-import { BaseGame, BaseGameData, BaseGameMove, BaseGamePlayer } from 'z-games-base-game';
+import { BaseGame } from 'z-games-base-game';
 
-const PLAYERS_MIN = 2;
-const PLAYERS_MAX = 6;
+import {
+  IPerudoData,
+  IPerudoPlayer,
+  IPerudoMove,
+} from './interfaces';
+import {
+  NAME,
+  NAME_WORK,
+  PLAYERS_MIN,
+  PLAYERS_MAX,
+  PLAYER_DICES_COUNT,
+  DICE_MAX_FIGURE,
+  JOKER_FIGURE,
+} from './constants';
 
-const PLAYER_DICES_COUNT = 5;
-const DICE_MAX_FIGURE = 6;
-const JOKER_FIGURE = 1;
-
-export interface PerudoData extends BaseGameData {
-  currentRound: number;
-  isMaputoRound: boolean;
-  lastRoundResults: PerudoPlayer[];
-  lastRoundFigure: number;
-  isLastRoundMaputo: boolean;
-  currentDiceFigure: number;
-  currentDiceNumber: number;
-  players: PerudoPlayer[];
-  lastPlayerId: string;
-}
-
-export interface PerudoPlayer extends BaseGamePlayer {
-  dices: number[];
-  dicesCount: number;
-}
-
-export interface PerudoMove extends BaseGameMove {
-  number: number;
-  figure: number;
-  notBelieve: boolean;
-  isMaputo: boolean;
-}
-
-export const PERUDO = 'Perudo';
+export * from './interfaces';
+export * from './constants';
 
 export class Perudo extends BaseGame {
   private static instance: Perudo;
@@ -40,8 +25,16 @@ export class Perudo extends BaseGame {
     return this.instance || (this.instance = new this());
   }
 
+  public getName = (): string => {
+    return NAME;
+  }
+
+  public getNameWork = (): string => {
+    return NAME_WORK;
+  }
+
   public getNewGame = (): { playersMax: number, playersMin: number, gameData: string } => {
-    const gameData: PerudoData = {
+    const gameData: IPerudoData = {
       currentRound: 0,
       lastRoundResults: [],
       lastRoundFigure: 0,
@@ -51,6 +44,7 @@ export class Perudo extends BaseGame {
       players: [],
       lastPlayerId: '',
       isMaputoRound: false,
+      lastPlayerNumber: 0,
     };
 
     return {
@@ -61,7 +55,7 @@ export class Perudo extends BaseGame {
   }
 
   public startGame = (gameDataJSON: string): { gameData: string, nextPlayersIds: string[] } => {
-    let gameData: PerudoData = JSON.parse(gameDataJSON);
+    let gameData: IPerudoData = JSON.parse(gameDataJSON);
 
     gameData.players = gameData.players.map(player => {
       return {
@@ -82,7 +76,7 @@ export class Perudo extends BaseGame {
   }
 
   public parseGameDataForUser = ({ gameData: gameDataJSON, userId }: { gameData: string, userId: string }): string => {
-    const gameData: PerudoData = JSON.parse(gameDataJSON);
+    const gameData: IPerudoData = JSON.parse(gameDataJSON);
 
     gameData.players.forEach((player, index) => {
       if (player.id !== userId) {
@@ -96,20 +90,40 @@ export class Perudo extends BaseGame {
     return JSON.stringify(gameData);
   }
 
-  public makeMove = ({ gameData: gameDataJSON, move: moveJSON, userId }: { gameData: string, move: string, userId: string }): {
+  public checkMove = ({ gameData: gameDataJSON, move: moveJSON, userId }: {
+    gameData: string,
+    move: string,
+    userId: string,
+  }): boolean => {
+    const gameData: IPerudoData = JSON.parse(gameDataJSON);
+    const move: IPerudoMove = JSON.parse(moveJSON);
+
+    if (move.notBelieve && (!gameData.currentDiceNumber || !gameData.currentDiceFigure)) {
+      return false;
+    }
+
+    // TODO!
+    return true;
+  }
+
+  public makeMove = ({ gameData: gameDataJSON, move: moveJSON, userId }: {
+    gameData: string,
+    move: string,
+    userId: string,
+  }): {
     gameData: string,
     nextPlayersIds: string[],
   } => {
-    let gameData: PerudoData = JSON.parse(gameDataJSON);
-    const move: PerudoMove = JSON.parse(moveJSON);
+    if (!this.checkMove({ gameData: gameDataJSON, move: moveJSON, userId })) {
+      throw new Error('Impossible move!');
+    }
+
+    let gameData: IPerudoData = JSON.parse(gameDataJSON);
+    const move: IPerudoMove = JSON.parse(moveJSON);
 
     let nextPlayerId: string;
 
     if (move.notBelieve) {
-      if (!gameData.currentDiceNumber || !gameData.currentDiceFigure) {
-        throw new Error('First move should be bet move');
-      }
-
       let countDiceNumber = 0;
 
       gameData.players.forEach(player => {
@@ -154,15 +168,6 @@ export class Perudo extends BaseGame {
       }
 
     } else {
-      if (!this.checkBetCorrect({
-        moveNumber: move.number,
-        figure: move.number,
-        currentDiceNumber: gameData.currentDiceNumber,
-        currentDiceFigure: gameData.currentDiceFigure,
-      })) {
-        throw new Error('Impossible bet');
-      }
-
       const playerNumber = this.getPlayerNumber({ players: gameData.players, userId });
 
       if (gameData.players[playerNumber].dicesCount === 1
@@ -218,7 +223,7 @@ export class Perudo extends BaseGame {
     return rules;
   }
 
-  private nextRound = (gameData: PerudoData): PerudoData => {
+  private nextRound = (gameData: IPerudoData): IPerudoData => {
     gameData.currentRound++;
     gameData.currentDiceFigure = 0;
     gameData.currentDiceNumber = 0;
@@ -236,7 +241,7 @@ export class Perudo extends BaseGame {
     return { ...gameData };
   }
 
-  private nextPlayer = ({ userId, players }: { userId: string, players: PerudoPlayer[] }): string => {
+  private nextPlayer = ({ userId, players }: { userId: string, players: IPerudoPlayer[] }): string => {
     if (this.activePlayersCount(players) <= 1) {
       return '';
     }
@@ -256,7 +261,7 @@ export class Perudo extends BaseGame {
     return players[nextPlayerNumber].id;
   }
 
-  private activePlayersCount = (players: PerudoPlayer[]): number => {
+  private activePlayersCount = (players: IPerudoPlayer[]): number => {
     let activePlayersCount = 0;
 
     players.forEach((player) => {
@@ -268,7 +273,7 @@ export class Perudo extends BaseGame {
     return activePlayersCount;
   }
 
-  private getPlayerNumber = ({ userId, players }: { userId: string, players: PerudoPlayer[] }): number => {
+  private getPlayerNumber = ({ userId, players }: { userId: string, players: IPerudoPlayer[] }): number => {
     let playerNumber = 0;
 
     players.forEach((player, index) => {
@@ -280,35 +285,18 @@ export class Perudo extends BaseGame {
     return playerNumber;
   }
 
-  private countDices = (players: PerudoPlayer[]): number => {
-    return players.reduce((diceCount: number, player: PerudoPlayer) => {
+  private countDices = (players: IPerudoPlayer[]): number => {
+    return players.reduce((diceCount: number, player: IPerudoPlayer) => {
       return diceCount + (player.dicesCount || 0);
     }, 0);
-  }
-
-  // TODO
-  private checkBetCorrect = ({ moveNumber, figure, currentDiceNumber, currentDiceFigure }: {
-    moveNumber: number,
-    figure: number,
-    currentDiceNumber: number,
-    currentDiceFigure: number,
-  }): boolean => {
-    // if (!moveNumber ||
-    //   !figure ||
-    //   moveNumber < currentDiceNumber ||
-    //   (moveNumber === currentDiceNumber && figure <= currentDiceFigure)) {
-    //   return false;
-    // }
-
-    return true;
   }
 }
 
 // For front-end
 
-export const countDices = (playersInGame: PerudoPlayer[]): number => {
-  return playersInGame.reduce((diceCount: number, playerInGame: PerudoPlayer) => {
-    return diceCount + (playerInGame.dicesCount || 0);
+export const countDices = (gamePlayers: IPerudoPlayer[]): number => {
+  return gamePlayers.reduce((diceCount: number, gamePlayer: IPerudoPlayer) => {
+    return diceCount + (gamePlayer.dicesCount || 0);
   }, 0);
 };
 
@@ -318,10 +306,10 @@ export const calculateStartBet = ({ currentDiceNumber, currentDiceFigure, allDic
   allDicesCount: number,
   isMaputoRound: boolean,
 }): {
-    diceNumber: number,
-    diceFigure: number,
-    isBetImpossible?: boolean,
-  } => {
+  diceNumber: number,
+  diceFigure: number,
+  isBetImpossible?: boolean,
+} => {
 
   if (!currentDiceNumber || !currentDiceFigure) {
     return { diceNumber: 1, diceFigure: 2 };
