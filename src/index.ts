@@ -44,7 +44,6 @@ export class Perudo extends BaseGame {
       players: [],
       lastPlayerId: '',
       isMaputoRound: false,
-      lastPlayerNumber: 0,
     };
 
     return {
