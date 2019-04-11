@@ -12,5 +12,4 @@ export interface IPerudoData extends IBaseGameData {
   currentDiceNumber: number;
   players: IPerudoPlayer[];
   lastPlayerId: string;
-  lastPlayerNumber: number; // TODO: Check
 }
