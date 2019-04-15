@@ -33,6 +33,10 @@ export class Perudo extends BaseGame {
     return NAME_WORK;
   }
 
+  public getOptionsVariants = (): Array<{ name: string, values: string[] }> => {
+    return [];
+  }
+
   public getNewGame = (): { playersMax: number, playersMin: number, gameData: string } => {
     const gameData: IPerudoData = {
       currentRound: 0,
@@ -44,6 +48,7 @@ export class Perudo extends BaseGame {
       players: [],
       lastPlayerId: '',
       isMaputoRound: false,
+      options: [],
     };
 
     return {
