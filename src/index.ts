@@ -44,7 +44,8 @@ export class Perudo extends BaseGame {
     const gameData: IPerudoData = {
       currentRound: 0,
       lastRoundResults: [],
-      lastRoundFigure: 0,
+      lastRoundDiceFigure: 0,
+      lastRoundDiceNumber: 0,
       isLastRoundMaputo: false,
       currentDiceFigure: 0,
       currentDiceNumber: 0,
@@ -169,7 +170,8 @@ export class Perudo extends BaseGame {
       }
 
       gameData.lastRoundResults = gameData.players.map(player => ({ ...player }));
-      gameData.lastRoundFigure = gameData.currentDiceFigure;
+      gameData.lastRoundDiceFigure = gameData.currentDiceFigure;
+      gameData.lastRoundDiceNumber = gameData.currentDiceNumber;
       gameData.isLastRoundMaputo = gameData.isMaputoRound;
       gameData.isMaputoRound = false;
 

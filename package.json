@@ -1,6 +1,6 @@
 {
   "name": "z-games-perudo",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Perudo game module for tiny board games portal",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
