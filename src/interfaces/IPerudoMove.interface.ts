@@ -1,6 +1,4 @@
-import { IBaseGameMove } from 'z-games-base-game';
-
-export interface IPerudoMove extends IBaseGameMove {
+export interface IPerudoMove {
   number: number;
   figure: number;
   notBelieve: boolean;

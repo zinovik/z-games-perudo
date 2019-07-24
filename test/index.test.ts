@@ -1,4 +1,4 @@
-import { Perudo } from '../';
+import { Perudo } from '../src';
 
 test('create new game instance', () => {
   const perudo = Perudo.Instance;
